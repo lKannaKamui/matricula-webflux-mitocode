@@ -6,8 +6,9 @@ import reactor.core.publisher.Mono;
 
 public interface GenericoService<T,ID>{
 
-    Flux<T> listarTodos();
+    Flux<T> listar();
     Mono<T> guardar(T t);
     Mono<T> buscar(ID id);
-
+    Mono<T> actualizar(ID id, T t);
+    Mono<Boolean> eliminar(ID id);
 }

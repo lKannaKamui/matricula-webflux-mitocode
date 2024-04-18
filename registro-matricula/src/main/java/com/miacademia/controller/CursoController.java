@@ -22,17 +22,12 @@ public class CursoController {
     public Mono<ResponseEntity<Flux<Curso>>> listar() {
         return Mono.just(ResponseEntity.ok()
                                        .contentType(MediaType.APPLICATION_JSON)
-                                       .body(cursoService.listarTodos()))
+                                       .body(cursoService.listar()))
                    .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
-//    public Mono<ResponseEntity<Mono<Curso>>> buscar(@PathVariable String id) {
     public Mono<ResponseEntity<Curso>> buscar(@PathVariable String id) {
-/*        return Mono.just(ResponseEntity.ok()
-                                       .contentType(MediaType.APPLICATION_JSON)
-                                       .body(cursoService.buscar(id)))
-                   .defaultIfEmpty(ResponseEntity.notFound().build());*/
           return cursoService.buscar(id).map(
                   c -> ResponseEntity.ok()
                           .contentType(MediaType.APPLICATION_JSON)
@@ -41,7 +36,37 @@ public class CursoController {
     }
 
     @PostMapping
-    public Mono<Curso> guardar(@RequestBody Curso curso){
-        return cursoService.guardar(curso);
+    public Mono<ResponseEntity<Curso>> guardar(@RequestBody Curso curso){
+
+        return cursoService.guardar(curso)
+                .map(e -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(e)
+                )
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<Curso>> update(@PathVariable String id,@RequestBody Curso curso){
+
+        return Mono.just(curso)
+                .map(c -> {
+                    c.setId(id);
+                    return c;
+                })
+                .flatMap(e -> cursoService.actualizar(id, curso))
+                .map(e -> ResponseEntity
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(e)
+                )
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    public Mono<ResponseEntity<Boolean>> eliminar(@PathVariable String id){
+        return cursoService.eliminar(id)
+                .map(e -> ResponseEntity
+                        .ok()
+                        .body(e))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
