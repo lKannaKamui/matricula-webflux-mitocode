@@ -1,7 +1,9 @@
 package com.miacademia.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,12 +19,12 @@ public class CursoDTO {
     private String id;
 
     @NotNull
-    @Length(min = 5, max = 30)
-    private String nombreCurso;
+    @Size(min = 3, max = 15, message = "Campo nombre entre 3 y 15 caracteres")
+    private String nombre;
 
     @NotNull
-    private String siglasCurso;
+    private String siglas;
 
     @NotNull
-    private Boolean estadoCurso;
+    private Boolean estado;
 }

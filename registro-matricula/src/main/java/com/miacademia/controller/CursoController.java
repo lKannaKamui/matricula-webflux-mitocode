@@ -1,12 +1,17 @@
 package com.miacademia.controller;
 
+import com.miacademia.dto.CursoDTO;
 import com.miacademia.model.Curso;
 import com.miacademia.service.CursoService;
 import com.miacademia.service.impl.CursoServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,27 +23,36 @@ public class CursoController {
 
     private final CursoService cursoService;
 
+    //add lombok.config to make use of annotations(ex. Qualifier) in constructors
+    @Qualifier("cursoMapper")
+    private final ModelMapper modelMapper;
+
     @GetMapping
-    public Mono<ResponseEntity<Flux<Curso>>> listar() {
+    public Mono<ResponseEntity<Flux<CursoDTO>>> listar() {
+
+        Flux<CursoDTO> cursos = cursoService.listar().map(this::convertirADTO);
+
         return Mono.just(ResponseEntity.ok()
                                        .contentType(MediaType.APPLICATION_JSON)
-                                       .body(cursoService.listar()))
+                                       .body(cursos))
                    .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Curso>> buscar(@PathVariable String id) {
-          return cursoService.buscar(id).map(
-                  c -> ResponseEntity.ok()
+    public Mono<ResponseEntity<CursoDTO>> buscar(@PathVariable String id) {
+          return cursoService.buscar(id)
+                  .map(this::convertirADTO)
+                  .map(c -> ResponseEntity.ok()
                           .contentType(MediaType.APPLICATION_JSON)
-                        .body(c)
-          ).defaultIfEmpty(ResponseEntity.notFound().build());
+                          .body(c))
+                  .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Curso>> guardar(@RequestBody Curso curso){
+    public Mono<ResponseEntity<CursoDTO>> guardar(@Valid @RequestBody CursoDTO curso){
 
-        return cursoService.guardar(curso)
+        return cursoService.guardar(convertirADocumento(curso))
+                .map(this::convertirADTO)
                 .map(e -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e)
@@ -46,14 +60,14 @@ public class CursoController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Curso>> update(@PathVariable String id,@RequestBody Curso curso){
+    public Mono<ResponseEntity<Curso>> actualizar(@PathVariable String id,@RequestBody CursoDTO curso){
 
         return Mono.just(curso)
                 .map(c -> {
                     c.setId(id);
                     return c;
                 })
-                .flatMap(e -> cursoService.actualizar(id, curso))
+                .flatMap(e -> cursoService.actualizar(id, convertirADocumento(curso)))
                 .map(e -> ResponseEntity
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,9 +78,20 @@ public class CursoController {
 
     public Mono<ResponseEntity<Boolean>> eliminar(@PathVariable String id){
         return cursoService.eliminar(id)
-                .map(e -> ResponseEntity
-                        .ok()
-                        .body(e))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .flatMap(result -> {
+                    if(result){
+                        return Mono.just(ResponseEntity.noContent().build());
+                    }else{
+                        return Mono.just(ResponseEntity.notFound().build());
+                    }
+                });
+    }
+
+    private CursoDTO convertirADTO(Curso model){
+        return modelMapper.map(model, CursoDTO.class);
+    }
+
+    private Curso convertirADocumento(CursoDTO dto){
+        return modelMapper.map(dto, Curso.class);
     }
 }
