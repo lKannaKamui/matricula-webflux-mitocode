@@ -1,14 +1,14 @@
 package com.miacademia.config;
 
 import com.miacademia.dto.CursoDTO;
+import com.miacademia.dto.EstudianteDTO;
 import com.miacademia.model.Curso;
+import com.miacademia.model.Estudiante;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ui.Model;
 
 @Configuration
 public class MapperConfig {
@@ -35,5 +35,27 @@ public class MapperConfig {
         escritor.addMapping(CursoDTO::getSiglas, (destino, valor) -> destino.setSiglas((String) valor));
         escritor.addMapping(CursoDTO::getEstado, (destino, valor) -> destino.setEstado((Boolean) valor));
         return cursoMapper;
+    }
+
+    @Bean("estudianteMapper")
+    public ModelMapper estudianteMapper(){
+        ModelMapper estudianteMapper = new ModelMapper();
+        estudianteMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        //lectura
+        TypeMap<Estudiante, EstudianteDTO> lector = estudianteMapper.createTypeMap(Estudiante.class, EstudianteDTO.class);
+        lector.addMapping(Estudiante::getNombres,(destino,valor) -> destino.setNombres((String) valor));
+        lector.addMapping(Estudiante::getApellidos, (destino, valor) -> destino.setApellidos((String) valor));
+        lector.addMapping(Estudiante::getDni, (destino, valor) -> destino.setDni((String) valor));
+        lector.addMapping(Estudiante::getEdad, (destino, valor) -> destino.setEdad((Integer) valor));
+
+        //escritura
+        TypeMap<EstudianteDTO, Estudiante> escritor = estudianteMapper.createTypeMap(EstudianteDTO.class, Estudiante.class);
+        escritor.addMapping(EstudianteDTO::getNombres, (destino, valor) -> destino.setNombres((String) valor));
+        escritor.addMapping(EstudianteDTO::getApellidos, (destino, valor) -> destino.setApellidos((String) valor));
+        escritor.addMapping(EstudianteDTO::getDni, (destino, valor) -> destino.setDni((String) valor));
+        escritor.addMapping(EstudianteDTO::getEdad, (destino, valor) -> destino.setEdad((Integer) valor));
+
+        return estudianteMapper;
     }
 }
