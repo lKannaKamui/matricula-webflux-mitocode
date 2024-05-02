@@ -44,6 +44,43 @@ public class EstudianteController {
                 ).defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<EstudianteDTO>> actualizar(@PathVariable String id, @Valid @RequestBody EstudianteDTO estudianteDTO){
+        return Mono.just(estudianteDTO)
+                .map(e -> {
+                    e.setId(id);
+                    return e;
+                })
+                .flatMap(e -> estudianteService.actualizar(id,convertirADocumento(estudianteDTO)))
+                .map(this::convertirADTO)
+                .map(e -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(e))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}")
+    public Mono<ResponseEntity<EstudianteDTO>> buscar(@PathVariable String id){
+        return estudianteService.buscar(id)
+                .map(this::convertirADTO)
+                .map(e -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(e))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping
+    public Mono<ResponseEntity<Boolean>> eliminar(@PathVariable String id){
+        return estudianteService.eliminar(id)
+                .flatMap(respuesta ->{
+                    if(respuesta){
+                        return Mono.just(ResponseEntity.noContent().build());
+                    }else{
+                        return Mono.just(ResponseEntity.notFound().build());
+                    }
+                });
+    }
+
     private EstudianteDTO convertirADTO(Estudiante model){
         return modelMapper.map(model, EstudianteDTO.class);
     }

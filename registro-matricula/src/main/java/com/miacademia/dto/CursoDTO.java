@@ -18,7 +18,7 @@ public class CursoDTO {
 
     private String id;
 
-    @NotNull
+    @NotNull(message = "nombre no puede ser nulo")
     //@Size(min = 3, max = 15, message = "Campo nombre entre 3 y 15 caracteres")
     private String nombre;
 

@@ -60,7 +60,7 @@ public class CursoController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Curso>> actualizar(@PathVariable String id,@RequestBody CursoDTO curso){
+    public Mono<ResponseEntity<CursoDTO>> actualizar(@PathVariable String id,@RequestBody CursoDTO curso){
 
         return Mono.just(curso)
                 .map(c -> {
@@ -68,6 +68,7 @@ public class CursoController {
                     return c;
                 })
                 .flatMap(e -> cursoService.actualizar(id, convertirADocumento(curso)))
+                .map(this::convertirADTO)
                 .map(e -> ResponseEntity
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,10 +77,11 @@ public class CursoController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping
     public Mono<ResponseEntity<Boolean>> eliminar(@PathVariable String id){
         return cursoService.eliminar(id)
-                .flatMap(result -> {
-                    if(result){
+                .flatMap(respuesta -> {
+                    if(respuesta){
                         return Mono.just(ResponseEntity.noContent().build());
                     }else{
                         return Mono.just(ResponseEntity.notFound().build());
