@@ -2,13 +2,17 @@ package com.miacademia.config;
 
 import com.miacademia.dto.CursoDTO;
 import com.miacademia.dto.EstudianteDTO;
+import com.miacademia.dto.MatriculaDTO;
 import com.miacademia.model.Curso;
 import com.miacademia.model.Estudiante;
+import com.miacademia.model.Matricula;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDateTime;
 
 @Configuration
 public class MapperConfig {
@@ -57,5 +61,29 @@ public class MapperConfig {
         escritor.addMapping(EstudianteDTO::getEdad, (destino, valor) -> destino.setEdad((Integer) valor));
 
         return estudianteMapper;
+    }
+
+    @Bean("matriculaMapper")
+    public ModelMapper matriculaMapper(){
+        ModelMapper matriculaMapper = new ModelMapper();
+        matriculaMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        //lectura
+        TypeMap<Matricula, MatriculaDTO> lector = matriculaMapper.createTypeMap(Matricula.class, MatriculaDTO.class);
+        lector.addMapping(Matricula::getFecha, (destino, valor) -> destino.setFecha((LocalDateTime) valor));
+        lector.addMapping(e -> e.getEstudiante().getId(), (destino, valor) -> destino.getEstudiante().setId((String) valor));
+        lector.addMapping(e -> e.getEstudiante().getNombres(),(destino, valor) -> destino.getEstudiante().setNombres((String) valor));
+        lector.addMapping(e -> e.getEstudiante().getDni(), (destino, valor) -> destino.getEstudiante().setDni((String) valor));
+        lector.addMapping(e -> e.getEstado(), (destino, valor) -> destino.setEstado((Boolean) valor));
+
+        //escritura
+        TypeMap<MatriculaDTO, Matricula> escritor = matriculaMapper.createTypeMap(MatriculaDTO.class, Matricula.class);
+        escritor.addMapping(MatriculaDTO::getFecha, (destino, valor) -> destino.setFecha((LocalDateTime) valor));
+        escritor.addMapping(e -> e.getEstudiante().getId(), (destino, valor) -> destino.getEstudiante().setId((String) valor));
+        escritor.addMapping(e -> e.getEstudiante().getNombres(), (destino, valor) -> destino.getEstudiante().setNombres((String) valor));
+        escritor.addMapping(e -> e.getEstudiante().getDni(), (destino, valor) -> destino.getEstudiante().setDni((String) valor));
+        escritor.addMapping(e -> e.getEstado(), (destino, valor) -> destino.setEstado((Boolean) valor));
+
+        return matriculaMapper;
     }
 }

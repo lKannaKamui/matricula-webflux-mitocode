@@ -8,6 +8,7 @@ import com.miacademia.service.EstudianteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
@@ -22,6 +23,7 @@ public class EstudianteController {
 
     private final EstudianteService estudianteService;
 
+    @Qualifier("estudianteMapper")
     private final ModelMapper modelMapper;
 
     @GetMapping
