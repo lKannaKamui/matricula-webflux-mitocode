@@ -1,4 +1,4 @@
-package com.miacademia.config.validator;
+package com.miacademia.validator;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
