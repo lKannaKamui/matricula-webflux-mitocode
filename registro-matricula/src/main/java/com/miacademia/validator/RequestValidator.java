@@ -26,6 +26,7 @@ public class RequestValidator {
             return Mono.just(t);
         }
 
+
         return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST));
     }
 }
