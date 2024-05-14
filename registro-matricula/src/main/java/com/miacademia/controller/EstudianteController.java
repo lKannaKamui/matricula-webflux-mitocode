@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.SortedMap;
+
 @RestController
 @RequestMapping("api/v1/estudiantes")
 @RequiredArgsConstructor
@@ -27,12 +29,22 @@ public class EstudianteController {
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<EstudianteDTO>>> listar(){
+    public Mono<ResponseEntity<Flux<EstudianteDTO>>> listar(@RequestParam(defaultValue = "-1", required = false) String orden){
         Flux<EstudianteDTO> estudiantes = estudianteService.listar().map(this::convertirADTO);
 
         return Mono.just(ResponseEntity.ok()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .body(estudiantes))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/listarPorOrden")
+    public Mono<ResponseEntity<Flux<EstudianteDTO>>> listarPorOrden(@RequestParam(defaultValue = "asc", required = false) String orderBy){
+        Flux<EstudianteDTO> estudiantes = estudianteService.listarPorOrden(orderBy).map(this::convertirADTO);
+
+        return Mono.just(ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(estudiantes))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 

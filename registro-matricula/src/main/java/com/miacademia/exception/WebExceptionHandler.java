@@ -1,5 +1,6 @@
 package com.miacademia.exception;
 
+import lombok.extern.java.Log;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
@@ -40,30 +43,38 @@ public class WebExceptionHandler extends AbstractErrorWebExceptionHandler { //ma
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         int statusCode = Integer.parseInt(String.valueOf(generalError.get("status")));
         Throwable error = getError(serverRequest);
+        String mensaje = error.getMessage();
+
+        if(error instanceof WebExchangeBindException){
+            WebExchangeBindException bindException = (WebExchangeBindException) error;
+            mensaje = bindException.getBindingResult().getAllErrors().stream().map(ObjectError::getDefaultMessage).findFirst().orElse(error.getMessage());
+        }else if(error instanceof LogicaException){
+            statusCode = 400;
+        }
 
         //switch mejorado, disponible desde Java 17
         switch (statusCode){
             case 400, 422 -> {
-                customError.put("message", error.getMessage());
+                customError.put("message", mensaje);
                 customError.put("status", 400);
                 status = HttpStatus.BAD_REQUEST;
             }
             case 404 -> {
-                customError.put("message", error.getMessage());
+                customError.put("message", mensaje);
                 customError.put("status", 404);
                 status = HttpStatus.NOT_FOUND;
             }
             case 401, 403 -> {
-                customError.put("message", error.getMessage());
+                customError.put("message", mensaje);
                 customError.put("status", 401);
                 status = HttpStatus.UNAUTHORIZED;
             }
             case 500 -> {
-                customError.put("message", error.getMessage());
+                customError.put("message", mensaje);
                 customError.put("status", 500);
             }
             default -> {
-                customError.put("message", error.getMessage());
+                customError.put("message", mensaje);
                 customError.put("status", 418);
                 status = HttpStatus.I_AM_A_TEAPOT;
             }

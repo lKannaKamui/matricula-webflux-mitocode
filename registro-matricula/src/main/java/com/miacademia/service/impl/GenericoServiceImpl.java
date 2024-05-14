@@ -3,6 +3,7 @@ package com.miacademia.service.impl;
 import com.miacademia.model.Curso;
 import com.miacademia.repository.GenericoRepository;
 import com.miacademia.service.GenericoService;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -41,4 +42,5 @@ public abstract class GenericoServiceImpl<T,ID> implements GenericoService<T,ID>
                             }
                 });
     }
+
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -26,7 +27,8 @@ public class RequestValidator {
             return Mono.just(t);
         }
 
+        Optional<String> mensaje = constraints.stream().map(cv -> cv.getMessage()).findFirst();
 
-        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST));
+        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, mensaje.get()));
     }
 }

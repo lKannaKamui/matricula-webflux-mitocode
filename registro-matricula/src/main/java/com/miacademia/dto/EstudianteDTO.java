@@ -1,6 +1,7 @@
 package com.miacademia.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,16 +16,17 @@ public class EstudianteDTO {
 
     private String id;
 
-    @NotNull
+    @NotNull(message = "el campo nombres no puede ser nulo")
     private String nombres;
 
-    @NotNull
+    @NotNull(message = "el campo apellidos no puede ser nulo")
     private String apellidos;
 
-    @NotNull
-    @NotBlank(message = "DNI no puede estar vacio")
+    @NotNull(message = "el campo DNI no puede ser nulo")
+    @Min(message = "El campo DNI lleva 8 digitos", value = 8)
     private String dni;
 
-    @NotNull
+    @NotNull(message = "el campo edad no puede ser nulo")
+    @Min(message = "La edad minima es 16", value = 16)
     private Integer edad;
 }

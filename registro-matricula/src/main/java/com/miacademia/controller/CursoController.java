@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class CursoController {
     @Qualifier("cursoMapper")
     private final ModelMapper modelMapper;
 
+    //@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @GetMapping
     public Mono<ResponseEntity<Flux<CursoDTO>>> listar() {
 
@@ -37,7 +39,7 @@ public class CursoController {
                                        .body(cursos))
                    .defaultIfEmpty(ResponseEntity.notFound().build());
     }
-
+    //@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @GetMapping("/{id}")
     public Mono<ResponseEntity<CursoDTO>> buscar(@PathVariable String id) {
           return cursoService.buscar(id)
@@ -48,6 +50,7 @@ public class CursoController {
                   .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    //@PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public Mono<ResponseEntity<CursoDTO>> guardar(@Valid @RequestBody CursoDTO curso){
 

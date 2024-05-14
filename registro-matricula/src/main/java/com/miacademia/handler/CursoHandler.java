@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -46,6 +47,7 @@ public class CursoHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public Mono<ServerResponse> guardar(ServerRequest request){
 
         Mono<CursoDTO> cursoDTOMono = request.bodyToMono(CursoDTO.class);
