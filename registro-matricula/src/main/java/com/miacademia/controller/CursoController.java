@@ -80,7 +80,7 @@ public class CursoController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Boolean>> eliminar(@PathVariable String id){
         return cursoService.eliminar(id)
                 .flatMap(respuesta -> {
