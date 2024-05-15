@@ -83,7 +83,7 @@ public class EstudianteController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Boolean>> eliminar(@PathVariable String id){
         return estudianteService.eliminar(id)
                 .flatMap(respuesta ->{

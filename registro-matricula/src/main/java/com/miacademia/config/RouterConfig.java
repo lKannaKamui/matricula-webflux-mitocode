@@ -6,6 +6,8 @@ import com.miacademia.handler.MatriculaHandler;
 import com.mongodb.internal.connection.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.server.RequestPredicate;
+import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -26,7 +28,9 @@ public class RouterConfig {
 
     @Bean
     public RouterFunction<ServerResponse> rutasEstudiante(EstudianteHandler handler){
+
         return route(GET("/api/v2/estudiantes"), handler::listar)
+                .andRoute(GET("/api/v2/estudiantes/listarPorOrden").or(queryParam("orderBy", t -> true)), handler::listarPorOrden)
                 .andRoute(GET("/api/v2/estudiantes/{id}"), handler::buscar)
                 .andRoute(POST("/api/v2/estudiantes"), handler::guardar)
                 .andRoute(PUT("/api/v2/estudiantes/{id}"), handler::actualizar)

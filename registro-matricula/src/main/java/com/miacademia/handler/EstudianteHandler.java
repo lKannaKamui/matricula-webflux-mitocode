@@ -35,6 +35,15 @@ public class EstudianteHandler {
                 .body(estudianteService.listar().map(this::convertirADTO), EstudianteDTO.class);
     }
 
+    public Mono<ServerResponse> listarPorOrden(ServerRequest request) {
+
+        String orden = request.queryParam("orderBy").orElse("");
+
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(estudianteService.listarPorOrden(orden).map(this::convertirADTO), EstudianteDTO.class);
+    }
+
     public Mono<ServerResponse> buscar(ServerRequest request) {
         String id = request.pathVariable("id");
 
@@ -84,7 +93,7 @@ public class EstudianteHandler {
         return estudianteService.eliminar(id)
                 .flatMap(resultado -> {
                     if(resultado){
-                        return ServerResponse.notFound().build();
+                        return ServerResponse.noContent().build();
                     }else{
                         return ServerResponse.notFound().build();
                     }

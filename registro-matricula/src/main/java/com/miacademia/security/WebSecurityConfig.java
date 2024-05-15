@@ -16,7 +16,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 //Clase S7
 @Configuration
 @EnableWebFluxSecurity
-@EnableReactiveMethodSecurity //autorizacion por metodos
+//@EnableReactiveMethodSecurity //autorizacion por metodos
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
@@ -31,24 +31,26 @@ public class WebSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
+                .authorizeExchange(req -> {
+                    req.pathMatchers("/login").permitAll();
+                    req.pathMatchers(HttpMethod.GET,"/api/*/cursos/**").hasAnyAuthority("ADMIN","USER")
+                            .pathMatchers(HttpMethod.POST,"/api/*/cursos/**").hasAnyAuthority("ADMIN")
+                            .pathMatchers(HttpMethod.DELETE,"/api/*/cursos/**").hasAnyAuthority("ADMIN")
+                            .pathMatchers(HttpMethod.PUT,"/api/*/cursos/**").hasAnyAuthority("ADMIN")
+
+                            .pathMatchers(HttpMethod.GET,"/api/*/estudiantes/**").hasAnyAuthority("ADMIN","USER")
+                            .pathMatchers(HttpMethod.POST,"/api/*/estudiantes/**").hasAnyAuthority("ADMIN")
+                            .pathMatchers(HttpMethod.DELETE,"/api/*/estudiantes/**").hasAnyAuthority("ADMIN")
+                            .pathMatchers(HttpMethod.PUT,"/api/*/estudiantes/**").hasAnyAuthority("ADMIN")
+
+                            .pathMatchers(HttpMethod.POST,"/api/*/matriculas/**").hasAnyAuthority("ADMIN")
+                            .anyExchange().authenticated();
+                })
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(Customizer.withDefaults())
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
-                .authorizeExchange(req -> {
-                    req.pathMatchers("/login").permitAll();
-                    req.pathMatchers(HttpMethod.GET,"/api/(v1|v2)/cursos/**").hasAnyRole("ADMIN","USER");
-                    req.pathMatchers(HttpMethod.POST,"/api/(v1|v2)/cursos/**").hasAnyRole("ADMIN");
-                    req.pathMatchers(HttpMethod.DELETE,"/api/(v1|v2)/cursos/**").hasAnyRole("ADMIN");
-                    req.pathMatchers(HttpMethod.PUT,"/api/(v1|v2)/cursos/**").hasAnyRole("ADMIN");
-                    req.pathMatchers(HttpMethod.GET,"/api/(v1|v2)/estudiantes/**").hasAnyRole("ADMIN","USER");
-                    req.pathMatchers(HttpMethod.POST,"/api/(v1|v2)/estudiantes/**").hasAnyRole("ADMIN");
-                    req.pathMatchers(HttpMethod.DELETE,"/api/(v1|v2)/estudiantes/**").hasAnyRole("ADMIN");
-                    req.pathMatchers(HttpMethod.PUT,"/api/(v1|v2)/estudiantes/**").hasAnyRole("ADMIN");
-                    req.pathMatchers(HttpMethod.GET,"/api/(v1|v2)/matriculas/**").hasAnyRole("ADMIN");
-                    req.anyExchange().authenticated();
-                })
                 .build();
     }
 }
